@@ -1,0 +1,1030 @@
+{
+  "name": "Sistema de Gestión de Inasistencias Escolares",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "inasistencias-webhook",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "0f891714-0127-4848-957c-01f7daa76aea",
+      "name": "Webhook Recepción",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -1568,
+        192
+      ],
+      "webhookId": "inasistencias-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $json.body || $json;\n\nconst nombre = data.nombre_estudiante || '';\nconst identificacion = data.id_estudiante || '';\nconst correo = data.correo || '';\n\nif (!nombre || !identificacion || !correo) {\n  throw new Error(\n    `Faltan campos obligatorios. Recibido: ${JSON.stringify(data)}`\n  );\n}\n\nreturn [\n  {\n    json: {\n      id_solicitud: 'SOL-' + Date.now(),\n      fecha_recepcion: new Date().toISOString(),\n      nombre_estudiante: nombre,\n      id_estudiante: identificacion,\n      correo: correo,\n      motivo_inasistencia: data.motivo_inasistencia || '',\n      tipo_justificacion: data.tipo_justificacion || '',\n      estado: 'Pendiente',\n      resultado_ia: '',\n      nivel_confianza: '',\n      texto_extraido: '',\n      decision: 'Pendiente',\n      fecha_decision: '',\n      observaciones: 'Solicitud recibida correctamente',\n      ultima_actualizacion: new Date().toISOString(),\n      inicio_procesamiento: Date.now(),\n      archivo_adjunto: data.archivo_adjunto ? 'ARCHIVO_PRESENTE' : ''\n    }\n  }\n];"
+      },
+      "id": "e481e248-c4e2-4478-b2d4-f0a65bb5d9ea",
+      "name": "Validar y Estructurar Datos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1344,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "=https://docs.google.com/spreadsheets/d/1Pptmw5DWNZE9b8bCBNwUgBJwSQUr5cmhGKu75vt8jZM/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Pptmw5DWNZE9b8bCBNwUgBJwSQUr5cmhGKu75vt8jZM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID Solicitud": "={{ $json.id_solicitud }}",
+            "Fecha Recepción": "={{ new Date().toISOString() }}",
+            "Nombre Estudiante": "={{ $json.nombre_estudiante }}",
+            "ID Estudiante": "={{ $json.id_estudiante }}",
+            "Correo": "={{ $json.correo }}",
+            "Tipo Justificación": "={{ $json.tipo_justificacion }}",
+            "Estado": "Pendiente",
+            "Resultado IA": "En análisis",
+            "Nivel Confianza": "0",
+            "Texto extraido": "Pendiente",
+            "Decisión Final": "Pendiente",
+            "Observaciones": "Solicitud recibida correctamente.",
+            "Ultima Actualizacion": "={{ new Date().toISOString() }}",
+            "Motivo": "={{ $json.motivo_inasistencia }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ID Solicitud",
+              "displayName": "ID Solicitud",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha Recepción",
+              "displayName": "Fecha Recepción",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nombre Estudiante",
+              "displayName": "Nombre Estudiante",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID Estudiante",
+              "displayName": "ID Estudiante",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Correo",
+              "displayName": "Correo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Motivo",
+              "displayName": "Motivo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tipo Justificación",
+              "displayName": "Tipo Justificación",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Resultado IA",
+              "displayName": "Resultado IA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nivel Confianza",
+              "displayName": "Nivel Confianza",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Texto extraido",
+              "displayName": "Texto extraido",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Decisión Final",
+              "displayName": "Decisión Final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha Decisión",
+              "displayName": "Fecha Decisión",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Ultima Actualizacion",
+              "displayName": "Ultima Actualizacion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "67114391-7416-48c0-8820-5d5669955191",
+      "name": "Google Sheets - Registro Inicial",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        -1120,
+        192
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "c6NvMET0nNUcQ3C3",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "tiene-archivo",
+              "leftValue": "={{ $('Validar y Estructurar Datos').item.json.archivo_adjunto || $json.archivo_adjunto }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "isNotEmpty"
+              }
+            },
+            {
+              "id": "9c831f84-ccec-4e70-8475-045b640d9db7",
+              "leftValue": "={{ $json.archivo_adjunto }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "bac818c6-41ea-416d-b0d6-723ab33c2d11",
+      "name": "¿Tiene Archivo Adjunto?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -896,
+        192
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const solicitud = $input.first().json;\n\nconst textoSimulado = solicitud.archivo_adjunto ? \n  `[DOCUMENTO ANALIZADO] Tipo: ${solicitud.tipo_justificacion}. Contenido relacionado con: ${solicitud.motivo_inasistencia}.` : \n  'No se proporcionó documento adjunto';\n\nconst motivoLower = (solicitud.motivo_inasistencia || '').toLowerCase();\nconst tipoLower = (solicitud.tipo_justificacion || '').toLowerCase();\n\nlet resultado = 'Dudosa';\nlet confianza = 0.5;\nlet observaciones = '';\n\nconst palabrasValidas = ['enfermedad', 'médico', 'hospital', 'emergencia', 'fallecimiento', 'accidente', 'covid', 'quirúrgico', 'gripe', 'alergia', 'fiebre'];\nconst palabrasInvalidas = ['vacaciones', 'viaje', 'fiesta', 'descanso', 'personal', 'sin motivo'];\n\nconst tieneValidas = palabrasValidas.some(p => motivoLower.includes(p) || tipoLower.includes(p));\nconst tieneInvalidas = palabrasInvalidas.some(p => motivoLower.includes(p) || tipoLower.includes(p));\n\nif (tieneValidas && !tieneInvalidas) {\n  resultado = 'Válida';\n  confianza = 0.92;\n  observaciones = 'Motivo médico detectado. Alta confianza.';\n} else if (tieneInvalidas) {\n  resultado = 'Inválida';\n  confianza = 0.88;\n  observaciones = 'Motivo no justificable detectado.';\n} else {\n  resultado = 'Dudosa';\n  confianza = 0.55;\n  observaciones = 'No se detectaron indicadores claros. Requiere revisión manual.';\n}\n\nreturn [{\n  json: {\n    ...solicitud,\n    texto_extraido: textoSimulado,\n    resultado_ia: resultado,\n    nivel_confianza: confianza,\n    observaciones_ia: observaciones,\n    fecha_analisis: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "568c65e6-a1ad-452c-9f51-6feb8826af32",
+      "name": "Análisis IA (OCR + Clasificación)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -672,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Cuando no hay archivo, marcar para revisión manual\nconst solicitud = {\n  ...$input.first().json,\n  nombre_estudiante: $('Validar y Estructurar Datos').item.json.nombre_estudiante || $input.first().json.nombre_estudiante,\n  id_estudiante: $('Validar y Estructurar Datos').item.json.id_estudiante || $input.first().json.id_estudiante,\n  correo: $('Validar y Estructurar Datos').item.json.correo || $input.first().json.correo\n};\n\nreturn [{\n  json: {\n    ...solicitud,\n    texto_extraido: 'No se adjuntó documento de soporte',\n    resultado_ia: 'Dudosa',\n    nivel_confianza: 0.3,\n    observaciones_ia: 'Solicitud sin archivo adjunto. Se requiere documento de soporte para validación.',\n    fecha_analisis: new Date().toISOString(),\n    decision: 'En Revisión'\n  }\n}];"
+      },
+      "id": "e809b8e2-ff3d-4a75-a91a-31d1057bffb0",
+      "name": "Procesar Sin Archivo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -224,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "alta-confianza",
+              "leftValue": "={{ $json.nivel_confianza }}",
+              "rightValue": 0.8,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "6e6e3bd8-fca6-4740-995f-55ee0cb483b3",
+      "name": "¿Confianza > 80%?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -448,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "confianza-media",
+              "leftValue": "={{ $json.nivel_confianza }}",
+              "rightValue": 0.5,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "41ea3d93-b647-4828-a492-8232d4f46999",
+      "name": "¿Confianza > 50%?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -224,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Decisión automática: Aprobación\nconst data = $input.first().json;\nconst esValida = data.resultado_ia === 'Válida';\n\nreturn [{\n  json: {\n    ...data,\n    decision: esValida ? 'Aprobado' : 'Rechazado',\n    estado: 'Completado',\n    fecha_decision: new Date().toISOString(),\n    observaciones: `${data.observaciones_ia} | Decisión automática por alta confianza (${(data.nivel_confianza * 100).toFixed(1)}%).`\n  }\n}];"
+      },
+      "id": "3023cdc6-5117-495f-a07d-d44f2b9f75aa",
+      "name": "Decisión Automática",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\nreturn [{\n  json: {\n    ...data,\n    decision: 'En Revisión',\n    estado: 'Pendiente Manual',\n    prioridad: data.nivel_confianza < 0.4 ? 'Alta' : 'Normal',\n    fecha_decision: '',\n    tiempo_procesamiento_ms: Date.now() - data.inicio_procesamiento,\n    observaciones: `${data.observaciones_ia} | Derivado a revisión manual. Confianza: ${(data.nivel_confianza * 100).toFixed(1)}%.`\n  }\n}];"
+      },
+      "id": "ecf8ef2f-aec9-40cc-b8ff-6927e2613b47",
+      "name": "Revisión Manual",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\nreturn [{\n  json: {\n    ...data,\n    decision: 'Rechazado',\n    estado: 'Completado',\n    fecha_decision: new Date().toISOString(),\n    tiempo_procesamiento_ms: Date.now() - data.inicio_procesamiento,\n    observaciones: `${data.observaciones_ia} | Rechazo preventivo por baja confianza (${(data.nivel_confianza * 100).toFixed(1)}%).`\n  }\n}];"
+      },
+      "id": "ff15d760-6ec6-4692-9de1-462f7fb0797a",
+      "name": "Rechazo Preventivo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1Pptmw5DWNZE9b8bCBNwUgBJwSQUr5cmhGKu75vt8jZM",
+          "mode": "list",
+          "cachedResultName": "Solicitudes",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Pptmw5DWNZE9b8bCBNwUgBJwSQUr5cmhGKu75vt8jZM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Pptmw5DWNZE9b8bCBNwUgBJwSQUr5cmhGKu75vt8jZM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID Solicitud": "={{ $('Google Sheets - Registro Inicial').item.json['ID Solicitud'] }}",
+            "Estado": "={{ $json.estado }}",
+            "Resultado IA": "={{ $json.resultado_ia }}",
+            "Nivel Confianza": "={{ $json.nivel_confianza }}",
+            "Texto extraido": "={{ $json.texto_extraido }}",
+            "Decisión Final": "={{ $json.decision }}",
+            "Fecha Decisión": "={{ new Date().toISOString() }}",
+            "Observaciones": "={{ $json.observaciones }}",
+            "Ultima Actualizacion": "={{ new Date().toISOString() }}",
+            "Nombre Estudiante": "={{ $('Google Sheets - Registro Inicial').item.json['Nombre Estudiante'] }}",
+            "Correo": "={{ $('Google Sheets - Registro Inicial').item.json.Correo }}",
+            "ID Estudiante": "={{ $('Google Sheets - Registro Inicial').item.json['ID Estudiante'] }}",
+            "Motivo": "={{ $('Google Sheets - Registro Inicial').item.json.Motivo }}",
+            "Tipo Justificación": "={{ $('Google Sheets - Registro Inicial').item.json['Tipo Justificación'] }}",
+            "Fecha Recepción": "={{ $('Google Sheets - Registro Inicial').item.json['Fecha Recepción'] }}"
+          },
+          "matchingColumns": [
+            "ID Solicitud"
+          ],
+          "schema": [
+            {
+              "id": "ID Solicitud",
+              "displayName": "ID Solicitud",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha Recepción",
+              "displayName": "Fecha Recepción",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nombre Estudiante",
+              "displayName": "Nombre Estudiante",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID Estudiante",
+              "displayName": "ID Estudiante",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Correo",
+              "displayName": "Correo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Motivo",
+              "displayName": "Motivo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tipo Justificación",
+              "displayName": "Tipo Justificación",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Resultado IA",
+              "displayName": "Resultado IA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nivel Confianza",
+              "displayName": "Nivel Confianza",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Texto extraido",
+              "displayName": "Texto extraido",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Decisión Final",
+              "displayName": "Decisión Final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha Decisión",
+              "displayName": "Fecha Decisión",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Ultima Actualizacion",
+              "displayName": "Ultima Actualizacion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "32f2b458-1188-4cb1-989b-326590198763",
+      "name": "Google Sheets - Actualizar Resultado",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        224,
+        192
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "c6NvMET0nNUcQ3C3",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "=7842442438",
+        "text": "==📋 *Nueva Solicitud Procesada*\n\n👤 Estudiante: {{ $json[\"Nombre Estudiante\"] }}\n🪪 ID: {{ $json[\"ID Estudiante\"] }}\n📧 Correo: {{ $json[\"Correo\"] }}\n\n🤖 Resultado IA: {{ $json[\"Resultado IA\"] }}\n📊 Confianza: {{ (Number($json[\"Nivel Confianza\"]) * 100).toFixed(1) }}%\n✅ Decisión: {{ $json[\"Decisión Final\"] }}\n\n📝 Obs: {{ $json[\"Observaciones\"] }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "86b114b3-05cb-464f-9f13-d709ef2db07e",
+      "name": "Telegram - Notificación Admin",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        448,
+        192
+      ],
+      "webhookId": "8427ccc8-c57e-4efb-bf45-74dabdcb8e2d",
+      "credentials": {
+        "telegramApi": {
+          "id": "hXRWbdvTSMxfyvlT",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, message: \"Solicitud recibida y procesada correctamente\", data: { id_solicitud: $json.id_solicitud, estado: $json.estado, decision: $json.decision, resultado_ia: $json.resultado_ia, confianza: $json.nivel_confianza, mensaje: $json.decision === \"Aprobado\" ? \"Su solicitud ha sido aprobada automaticamente.\" : $json.decision === \"Rechazado\" ? \"Su solicitud no cumple con los requisitos.\" : \"Su solicitud esta en revision manual.\" } }) }}",
+        "options": {}
+      },
+      "id": "37188fe4-aa5d-42ba-bf25-e7e0d1d0f1d0",
+      "name": "Respuesta Web al Estudiante",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        672,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "telegram-consulta",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "138782d7-2918-4d1f-9877-457f9df73fd4",
+      "name": "Webhook - Consulta Telegram",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -1568,
+        848
+      ],
+      "webhookId": "telegram-consulta"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "documentId": {
+          "__rl": true,
+          "value": "1Pptmw5DWNZE9b8bCBNwUgBJwSQUr5cmhGKu75vt8jZM",
+          "mode": "id"
+        }
+      },
+      "id": "b81727d5-4476-4ebf-860b-ec2eb7bca35f",
+      "name": "Buscar Solicitud en Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        -1344,
+        848
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "c6NvMET0nNUcQ3C3",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "encontrado",
+              "leftValue": "={{ $json['ID Solicitud'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "isNotEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "2580e0a2-a426-48c5-92dc-ea2a98ae4ac8",
+      "name": "¿Solicitud Encontrada?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -1120,
+        848
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": false,\n  \"message\": \"No se encontró ninguna solicitud con ese ID. Verifique e intente nuevamente.\"\n}",
+        "options": {}
+      },
+      "id": "d86d9276-3cef-4c4a-a50f-a1f12bbbe4bb",
+      "name": "Respuesta - No Encontrado",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        -896,
+        944
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"data\": {\n    \"id_solicitud\": $json['ID Solicitud'],\n    \"estudiante\": $json['Nombre Estudiante'],\n    \"motivo\": $json['Motivo'],\n    \"estado\": $json['Estado'],\n    \"decision\": $json['Decisión Final'],\n    \"resultado_ia\": $json['Resultado IA'],\n    \"confianza\": $json['Nivel Confianza'],\n    \"fecha_recepcion\": $json['Fecha Recepción'],\n    \"fecha_decision\": $json['Fecha Decisión'],\n    \"observaciones\": $json['Observaciones']\n  }\n}",
+        "options": {}
+      },
+      "id": "e6dee315-9a48-4530-a67c-79156b22c976",
+      "name": "Respuesta - Consulta Exitosa",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        -896,
+        752
+      ]
+    }
+  ],
+  "pinData": {
+    "Webhook Recepción": [
+      {
+        "json": {
+          "headers": {
+            "host": "micipoter.app.n8n.cloud",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 OPR/130.0.0.0",
+            "content-length": "229",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "accept-language": "es-419,es;q=0.9,en;q=0.8,ko;q=0.7",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "181.63.164.10",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "CO",
+            "cf-ray": "9f4c2d695de0ca03-MIA",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "origin": "null",
+            "priority": "u=1, i",
+            "sec-ch-ua": "\"Chromium\";v=\"146\", \"Not-A.Brand\";v=\"24\", \"Opera\";v=\"130\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Windows\"",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "cross-site",
+            "x-forwarded-for": "181.63.164.10, 172.68.7.200",
+            "x-forwarded-host": "micipoter.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-112-7ff556c8c8-958vl",
+            "x-is-trusted": "yes",
+            "x-real-ip": "181.63.164.10"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "nombre_estudiante": "qwf",
+            "id_estudiante": "wef",
+            "correo": "nichama100@gmail.com",
+            "fecha_inasistencia": "3123-12-14",
+            "motivo_inasistencia": "gripe",
+            "tipo_justificacion": "Médica",
+            "archivo_adjunto": "uso_celular_infografia_final.pdf"
+          },
+          "webhookUrl": "https://micipoter.app.n8n.cloud/webhook/inasistencias-webhook",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook Recepción": {
+      "main": [
+        [
+          {
+            "node": "Validar y Estructurar Datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar y Estructurar Datos": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Registro Inicial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Registro Inicial": {
+      "main": [
+        [
+          {
+            "node": "¿Tiene Archivo Adjunto?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Tiene Archivo Adjunto?": {
+      "main": [
+        [
+          {
+            "node": "Análisis IA (OCR + Clasificación)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Análisis IA (OCR + Clasificación)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Análisis IA (OCR + Clasificación)": {
+      "main": [
+        [
+          {
+            "node": "¿Confianza > 80%?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Procesar Sin Archivo": {
+      "main": [
+        [
+          {
+            "node": "Revisión Manual",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Confianza > 80%?": {
+      "main": [
+        [
+          {
+            "node": "Decisión Automática",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "¿Confianza > 50%?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Confianza > 50%?": {
+      "main": [
+        [
+          {
+            "node": "Revisión Manual",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Rechazo Preventivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decisión Automática": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Actualizar Resultado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revisión Manual": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Actualizar Resultado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rechazo Preventivo": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Actualizar Resultado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Actualizar Resultado": {
+      "main": [
+        [
+          {
+            "node": "Telegram - Notificación Admin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram - Notificación Admin": {
+      "main": [
+        [
+          {
+            "node": "Respuesta Web al Estudiante",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Consulta Telegram": {
+      "main": [
+        [
+          {
+            "node": "Buscar Solicitud en Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Solicitud en Sheets": {
+      "main": [
+        [
+          {
+            "node": "¿Solicitud Encontrada?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Solicitud Encontrada?": {
+      "main": [
+        [
+          {
+            "node": "Respuesta - Consulta Exitosa",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respuesta - No Encontrado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "001ee081-cde2-4913-9e0b-62fd542385ad",
+  "meta": {
+    "instanceId": "b490e2106b6ecd52760567ea31c5e4a1d5e3ea27e644050684ff62b98d0580a0"
+  },
+  "id": "SrSPLYLvKVOTMq1r",
+  "tags": [
+    {
+      "updatedAt": "2026-04-28T12:52:10.020Z",
+      "createdAt": "2026-04-28T12:52:10.020Z",
+      "id": "kXt6e0f3UdblZL5i",
+      "name": "Educación"
+    },
+    {
+      "updatedAt": "2026-04-28T12:52:09.993Z",
+      "createdAt": "2026-04-28T12:52:09.993Z",
+      "id": "m8ESIyEGpNdeqFRv",
+      "name": "Automatización"
+    }
+  ]
+}
